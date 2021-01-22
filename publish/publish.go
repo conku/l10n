@@ -5,10 +5,10 @@ import (
 	"net/http"
 
 	"github.com/conku/admin"
+	"github.com/conku/gorm"
 	"github.com/conku/l10n"
 	"github.com/conku/publish"
 	"github.com/conku/qor"
-	"github.com/jinzhu/gorm"
 )
 
 type availableLocalesInterface interface {

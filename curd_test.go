@@ -3,8 +3,8 @@ package l10n_test
 import (
 	"testing"
 
+	"github.com/conku/gorm"
 	"github.com/conku/l10n"
-	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"
 
 	_ "github.com/go-sql-driver/mysql"
