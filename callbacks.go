@@ -24,7 +24,7 @@ func beforeQuery(scope *gorm.Scope) {
 		case "reverse":
 			if !scope.Search.Unscoped && hasDeletedAtColumn {
 				scope.Search.Where(fmt.Sprintf(
-					"(%v.%v NOT IN (SELECT DISTINCT(%v) FROM %v t2 WHERE t2.language_code = ? AND t2.deleted_at IS NULL) AND %v.language_code = ?)", quotedTableName, quotedPrimaryKey, quotedPrimaryKey, quotedTableName, quotedTableName), locale, Global)
+					"(%v.%v NOT IN (SELECT DISTINCT(%v) FROM %v t2 WHERE t2.language_code = ? AND t2.deleted_at = 0) AND %v.language_code = ?)", quotedTableName, quotedPrimaryKey, quotedPrimaryKey, quotedTableName, quotedTableName), locale, Global)
 			} else {
 				scope.Search.Where(fmt.Sprintf("(%v.%v NOT IN (SELECT DISTINCT(%v) FROM %v t2 WHERE t2.language_code = ?) AND %v.language_code = ?)", quotedTableName, quotedPrimaryKey, quotedPrimaryKey, quotedTableName, quotedTableName), locale, Global)
 			}
@@ -33,7 +33,7 @@ func beforeQuery(scope *gorm.Scope) {
 		default:
 			if isLocale {
 				if !scope.Search.Unscoped && hasDeletedAtColumn {
-					scope.Search.Where(fmt.Sprintf("((%v.%v NOT IN (SELECT DISTINCT(%v) FROM %v t2 WHERE t2.language_code = ? AND t2.deleted_at IS NULL) AND %v.language_code = ?) OR %v.language_code = ?) AND %v.deleted_at IS NULL", quotedTableName, quotedPrimaryKey, quotedPrimaryKey, quotedTableName, quotedTableName, quotedTableName, quotedTableName), locale, Global, locale)
+					scope.Search.Where(fmt.Sprintf("((%v.%v NOT IN (SELECT DISTINCT(%v) FROM %v t2 WHERE t2.language_code = ? AND t2.deleted_at = 0) AND %v.language_code = ?) OR %v.language_code = ?) AND %v.deleted_at = 0", quotedTableName, quotedPrimaryKey, quotedPrimaryKey, quotedTableName, quotedTableName, quotedTableName, quotedTableName), locale, Global, locale)
 				} else {
 					scope.Search.Where(fmt.Sprintf("(%v.%v NOT IN (SELECT DISTINCT(%v) FROM %v t2 WHERE t2.language_code = ?) AND %v.language_code = ?) OR (%v.language_code = ?)", quotedTableName, quotedPrimaryKey, quotedPrimaryKey, quotedTableName, quotedTableName, quotedTableName), locale, Global, locale)
 				}
@@ -87,7 +87,7 @@ func afterUpdate(scope *gorm.Scope) {
 
 					// if enabled soft delete, delete soft deleted records
 					if scope.HasColumn("DeletedAt") {
-						scope.NewDB().Unscoped().Where("deleted_at is not null").Where(query, locale, scope.PrimaryKeyValue()).Delete(scope.Value)
+						scope.NewDB().Unscoped().Where("deleted_at != 0").Where(query, locale, scope.PrimaryKeyValue()).Delete(scope.Value)
 					}
 
 					// if no localized records exist, localize it
